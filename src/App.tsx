@@ -1,10 +1,17 @@
-import React from 'react';
+import React, {Fragment, Suspense, lazy} from 'react';
+
+const Login = lazy(() => import('./screens/login/index'));
+const Admin = lazy(() => import('./screens/dashboard/index'));
 
 function App() {
+    // TODO: when api docs are ready adding in authentication setup
+    const isAuthenticated = true;
   return (
-    <div className="text-purple-500">
-      <p>Parkeringskompagniet's admin</p>
-    </div>
+      <Fragment>
+          <Suspense fallback={Login}>
+              {isAuthenticated ? <Admin /> : <Login />}
+          </Suspense>
+      </Fragment>
   );
 }
 
