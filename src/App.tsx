@@ -16,9 +16,10 @@ const App: React.FC = () => {
 
     }, [data.userData.isAuthenticated])
 
+    console.log(data.loadingState)
   return (
       <Suspense fallback={<LoadingScreen />}>
-          {isAuth ? <Admin userName={data.userData.name} /> : <Login />}
+          {isAuth ? <Admin userName={data.userData.name} /> : <Login isLoading={data.loadingState} />}
       </Suspense>
   );
 }
