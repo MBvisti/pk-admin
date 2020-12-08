@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {IoIosArrowDown} from "react-icons/all";
+import {Link} from "react-router-dom";
 
 interface SideBarElementProps {
     icon: JSX.Element,
@@ -23,11 +24,13 @@ export const SideBarElement = ({icon, children, subLinks, isActive, handleActive
             handleActiveElement(e)
             setIsOpen(!isOpen)
         }} className={`text-white cursor-pointer md:mb-2 md:flex md:flex-col md:min-w-full ${isActive ? "md:border-r-4 md:border-white" : "" }`}>
-            <div className="md:flex md:items-center md:h-10">
-                {icon}
-                {children}
-                {subLinks?.length !== undefined ? <IoIosArrowDown className="md:absolute md:right-6" /> : ""}
-            </div>
+            <Link to={`/${elementName}`}>
+                <div className="md:flex md:items-center md:h-10">
+                    {icon}
+                    {children}
+                    {subLinks?.length !== undefined ? <IoIosArrowDown className="md:absolute md:right-6" /> : ""}
+                </div>
+            </Link>
             {
                 isOpen && subLinks !== undefined ?
                 <div className="md:ml-10 md:text-sm">
