@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
     BrowserRouter as Router,
     Switch,
@@ -21,13 +21,25 @@ import {Messages} from "./screens/messages";
 import {Forms} from "./screens/forms";
 import {Settings} from "./screens/settings";
 
-function Admin() {
+interface AdminState {
+    name: string,
+}
+
+interface AdminProps {
+    userName: string
+}
+
+function Admin({userName}: AdminProps) {
+    const [state] = useState<AdminState>({
+        name: userName,
+    })
+
     return (
         <div className="md:flex md:min-h-screen md:min-w-full md:max-w-full">
             <Router>
                 <SideBar />
                 <div className="md:flex-grow md:bg-gray-200 md:px-8">
-                    <Header userName="Simon Høj" />
+                    <Header userName={state.name} />
                     <Switch>
                         <Route path="/parking" >
                             <Parking />
