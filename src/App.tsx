@@ -1,13 +1,18 @@
-import React, {Fragment} from 'react';
-import Admin from "./screens/dashboard";
+import React, {lazy, Suspense} from 'react';
+import {useAuth, UserData} from "./context/authContext";
+import {LoadingScreen} from "./screens/loadingScreen";
+
+const Admin = lazy(() => import('./screens/dashboard'))
+const Login = lazy(() => import('./screens/login'))
 
 
-const App = () => {
+const App: React.FC = () => {
     // TODO: when api docs are ready adding in authentication setup
+    const userData = useAuth() as UserData;
   return (
-      <Fragment>
-          <Admin />
-      </Fragment>
+      <Suspense fallback={<LoadingScreen />}>
+          {userData.accessToken ? <Admin /> : <Login />}
+      </Suspense>
   );
 }
 
