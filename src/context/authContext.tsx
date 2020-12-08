@@ -1,24 +1,15 @@
 import React, {useState} from 'react';
+import {AuthState, UserAuthDetails, UserData} from "./interfaces";
 
 const AuthContext = React.createContext({});
 export const useAuth = () => React.useContext(AuthContext);
 
-export interface UserData {
-    name: string,
-    accessToken: string,
-}
-
-interface AuthState {
-    userData: UserData,
-    status: string,
-    error: string | null,
-}
-
 const AuthProvider = (props: any) => {
-    const [state] = useState<AuthState>({
+    const [state, setState] = useState<AuthState>({
         userData: {
             name: "Simon Høj",
-            accessToken: "kdaæmdksalmdlmaskdmsaklmdklsamdmaskdmkaslmdkmdklasmkldmsakldmklasmdklasml",
+            accessToken: "",
+            isAuthenticated: false,
         },
         status: 'pending',
         error: null
@@ -83,6 +74,19 @@ const AuthProvider = (props: any) => {
     //         });
     // }
 
+    const login = (e: Event, payload: UserAuthDetails ) => {
+        e.preventDefault()
+
+        setState({
+            ...state,
+            userData: {
+                name: payload.username,
+                accessToken: payload.password,
+                isAuthenticated: true,
+            }
+        })
+    }
+
     // const logout = async () => {
     //     const res = await api.authentication("logout").logout()
     //
@@ -98,10 +102,10 @@ const AuthProvider = (props: any) => {
     //     }
     // }
 
-    const userData = state.userData;
+    const userData = state.userData as UserData;
 
     return (
-        <AuthContext.Provider value={userData} {...props} />
+        <AuthContext.Provider value={{userData, login}} {...props} />
     );
 }
 
