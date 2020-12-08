@@ -1,6 +1,6 @@
 import React, {ChangeEvent, FormEvent, Fragment, useState} from 'react';
 import { useAuth } from "../../context/authContext";
-import {AuthFunctions, AuthPayload} from '../../context/interfaces'
+import {AuthFunctions} from '../../context/interfaces'
 
 interface LoginState {
     password: string,
