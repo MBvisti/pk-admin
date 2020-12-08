@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {AuthState, UserAuthDetails, UserData} from "./interfaces";
+import {endpoints} from "../http/api";
 
 const AuthContext = React.createContext({});
 export const useAuth = () => React.useContext(AuthContext);
@@ -74,8 +75,11 @@ const AuthProvider = (props: any) => {
     //         });
     // }
 
-    const login = (e: Event, payload: UserAuthDetails ) => {
+    const login = async (e: Event, payload: UserAuthDetails ) => {
         e.preventDefault()
+
+        const res = await endpoints.authentication().userLogin(payload)
+        console.log(res);
 
         setState({
             ...state,
