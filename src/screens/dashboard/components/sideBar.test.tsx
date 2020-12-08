@@ -2,7 +2,6 @@ import React from 'react';
 import {fireEvent, render, screen} from '@testing-library/react'
 import {BrowserRouter as Router} from "react-router-dom";
 import {SideBar} from "./sideBar";
-import exp from "constants";
 
 const routerWrapper: React.FC = ({children}) => {
     return (
@@ -17,8 +16,6 @@ const routerWrapper: React.FC = ({children}) => {
 const customRender = (ui: React.ReactElement, options: any) => {
     render(ui, {wrapper: routerWrapper, ...options})
 }
-
-
 
 test("should render sidebar with all sidebar elements", () => {
     customRender(<SideBar/>, {})
