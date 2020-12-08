@@ -11,8 +11,9 @@ export interface AuthPayload {
     loadingState: boolean,
 }
 
+
 export interface AuthFunctions {
-    login: any,
+    login: (formEvent: React.FormEvent, state: UserAuthDetails) => {},
     logout: any,
 }
 
