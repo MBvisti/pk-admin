@@ -7,11 +7,11 @@ export const useAuth = () => React.useContext(AuthContext);
 const AuthProvider = (props: any) => {
     const [state, setState] = useState<AuthState>({
         userData: {
-            name: "Simon Høj",
+            name: "",
             accessToken: "",
             isAuthenticated: false,
         },
-        status: 'pending',
+        loading: false,
         error: null
     })
 
@@ -79,12 +79,21 @@ const AuthProvider = (props: any) => {
 
         setState({
             ...state,
-            userData: {
-                name: payload.username,
-                accessToken: payload.password,
-                isAuthenticated: true,
-            }
+            loading: true,
         })
+
+        setTimeout(() => {
+            setState({
+                ...state,
+                userData: {
+                    name: payload.username,
+                    accessToken: payload.password,
+                    isAuthenticated: true,
+                },
+                loading: false
+            })
+        }, 4000)
+
     }
 
     // const logout = async () => {
@@ -103,9 +112,10 @@ const AuthProvider = (props: any) => {
     // }
 
     const userData = state.userData as UserData;
+    const loadingState = state.loading;
 
     return (
-        <AuthContext.Provider value={{userData, login}} {...props} />
+        <AuthContext.Provider value={{userData, login, loadingState}} {...props} />
     );
 }
 
