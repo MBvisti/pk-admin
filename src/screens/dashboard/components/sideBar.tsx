@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import {SideBarElement} from "./sideBarElement";
-import {
-    AiOutlineHome,
-    MdPlace,
-    BiEuro,
-    FaUsers,
-    RiParkingLine,
-    BsExclamationTriangle,
-    IoHardwareChipOutline, FiMessageSquare, FaWpforms, FiSettings
-} from "react-icons/all";
+import {AiOutlineHome} from 'react-icons/ai'
+import {MdPlace} from 'react-icons/md'
+import {BiEuro} from 'react-icons/bi'
+import {FaUsers} from 'react-icons/fa'
+import {RiParkingLine} from 'react-icons/ri'
+import {BsExclamationTriangle} from 'react-icons/bs'
+import {IoHardwareChipOutline} from 'react-icons/io5'
+import {FiMessageSquare, FiSettings} from 'react-icons/fi'
+import {FaWpforms} from 'react-icons/fa'
 
 interface SideBarState {
     selectedElement: string | undefined;

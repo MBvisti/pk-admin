@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {IoIosArrowDown} from "react-icons/all";
+import {IoIosArrowDown} from "react-icons/io";
 import {Link} from "react-router-dom";
 
 interface SideBarElementProps {
