@@ -27,7 +27,7 @@ function Admin() {
             <Router>
                 <SideBar />
                 <div className="md:flex-grow md:bg-gray-200 md:px-8">
-                    <Header />
+                    <Header userName="Simon Høj" />
                     <Switch>
                         <Route path="/parking" >
                             <Parking />
