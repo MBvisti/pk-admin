@@ -4,12 +4,9 @@ import {useAuth} from './authContext';
 
 const UserContext = React.createContext({})
 
-const UserProvider: React.FC = () => {
-    const userData = useAuth();
-    return (
-            <UserContext.Provider value={userData} />
-    )
-}
+const UserProvider: React.FC = () => (
+    <UserContext.Provider value={{test: "some data here"}} />
+)
 
 
 // and the useUser hook is basically this:

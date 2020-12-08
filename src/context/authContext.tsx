@@ -3,11 +3,22 @@ import React, {useState} from 'react';
 const AuthContext = React.createContext({});
 export const useAuth = () => React.useContext(AuthContext);
 
+export interface UserData {
+    name: string,
+    accessToken: string,
+}
+
+interface AuthState {
+    userData: UserData,
+    status: string,
+    error: string | null,
+}
+
 const AuthProvider = (props: any) => {
-    const [state] = useState({
+    const [state] = useState<AuthState>({
         userData: {
-            name: "",
-            accessToken: "",
+            name: "Simon Høj",
+            accessToken: "kdaæmdksalmdlmaskdmsaklmdklsamdmaskdmkaslmdkmdklasmkldmsakldmklasmdklasml",
         },
         status: 'pending',
         error: null
@@ -87,10 +98,10 @@ const AuthProvider = (props: any) => {
     //     }
     // }
 
-    const { userData } = state;
+    const userData = state.userData;
 
     return (
-        <AuthContext.Provider value={{userData}} {...props} />
+        <AuthContext.Provider value={userData} {...props} />
     );
 }
 
