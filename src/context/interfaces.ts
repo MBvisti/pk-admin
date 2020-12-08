@@ -4,9 +4,11 @@ export interface UserData {
     isAuthenticated: boolean,
 }
 
+
 export interface AuthPayload {
     userData: UserData,
     authFunctions: AuthFunctions,
+    loadingState: boolean,
 }
 
 export interface AuthFunctions {
@@ -21,6 +23,6 @@ export interface UserAuthDetails {
 
 export interface AuthState {
     userData: UserData,
-    status: string,
+    loading: boolean,
     error: string | null,
 }
