@@ -78,8 +78,9 @@ const AuthProvider = (props: any) => {
     const login = async (e: Event, payload: UserAuthDetails ) => {
         e.preventDefault()
 
+        console.log(payload)
+
         const res = await endpoints.authentication().userLogin(payload)
-        console.log(res);
 
         setState({
             ...state,
@@ -98,6 +99,15 @@ const AuthProvider = (props: any) => {
             })
         }, 4000)
 
+        // apiClient.interceptors.request.use(
+        //     config => {
+        //         config.headers["Token"] = res.data.token
+        //         return config;
+        //     },
+        //     error => {
+        //         console.log(error)
+        //     }
+        // )
     }
 
     // const logout = async () => {

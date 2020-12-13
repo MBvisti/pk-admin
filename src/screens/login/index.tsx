@@ -32,7 +32,7 @@ function Login({isLoading}: LoginProps) {
     return (
         <div className="md:flex md:min-h-screen md:min-w-full md:max-w-full md:items-center md:justify-center md:bg-gray-200">
             <form
-                onSubmit={(e: FormEvent) => authData.login(e, state) }
+                onSubmit={(e: FormEvent) => authData.login(e, {password: state.password, username: state.username}) }
                 className="bg-white md:rounded md:h-64 md:w-1/3 md:border md:border-black md:shadow-md md:py-6 md:px-10 md:flex md:flex-col md:items-center md:justify-center">
                 {
                     isLoading ?

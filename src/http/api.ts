@@ -2,10 +2,11 @@ import axios from 'axios';
 
 // Import config
 import { axiosConfig } from './config';
+import {UserAuthDetails} from "../context/interfaces";
 
 export const apiClient = axios.create({
     baseURL: axiosConfig.baseURL,
-    withCredentials: true,
+    withCredentials: false,
     headers: {
         "Content-Type": "application/json",
     },
@@ -20,7 +21,7 @@ export const endpoints = {
     },
     authentication() {
         return {
-            userLogin: (userDetails: any) => apiClient.post("/Login/Authenticate", userDetails),
+            userLogin: (userDetails: UserAuthDetails) => apiClient.post("/Login/Authenticate", JSON.stringify(userDetails)),
             // refreshToken: () => apiClient.post(url),
             // logout: () => apiClient.post(url),
         }
