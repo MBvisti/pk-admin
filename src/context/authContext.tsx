@@ -43,7 +43,7 @@ const AuthProvider = (props: any) => {
                 console.log(error)
             }
         )
-    }, [])
+    }, [state, tknDetails])
 
     // TODO: revisited this auth flow when getting closer to prod
     const login = async (e: Event, payload: UserAuthDetails ) => {
@@ -60,7 +60,7 @@ const AuthProvider = (props: any) => {
             setState({
                 ...state,
                 userData: {
-                    name: res.data.name,
+                    name: res.data.user.name,
                     accessToken: res.headers["token"],
                     isAuthenticated: true,
                 },
@@ -77,10 +77,12 @@ const AuthProvider = (props: any) => {
                 }
             )
 
+            console.log(res.data)
+
             // set a cookie with token details
             Cookies.set("pk-admin", {
                 token: res.headers["token"],
-                name: res.data.name,
+                name: res.data.user.name,
                 tknExpiry: res.headers["tokenexpiry"]
             })
         }
