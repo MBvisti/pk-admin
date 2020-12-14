@@ -2,6 +2,9 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Test authentication details
+There are two test user available: beboerparkering and phonex. Both uses the password: 1234Abcd
+
 ## Available Scripts
 
 In the project directory, you can run:
