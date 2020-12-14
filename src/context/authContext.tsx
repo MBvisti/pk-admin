@@ -17,33 +17,33 @@ const AuthProvider = (props: any) => {
         error: null
     })
 
-    const tknDetails = Cookies.getJSON("pk-admin")
-
     // TODO: revisited this auth flow when getting closer to prod
     useEffect(() => {
+        const tknDetails = Cookies.getJSON("pk-admin")
         if (tknDetails) {
             console.log(tknDetails["tknExpiry"] > Date.now())
-            setState({
-                ...state,
+            setState(s => ({
+                ...s,
                 userData: {
                     name: tknDetails.name,
                     accessToken: tknDetails["token"],
                     isAuthenticated: true,
                 },
                 loading: false
-            })
+            }))
+
+            apiClient.interceptors.request.use(
+                config => {
+                    config.headers["Token"] = state.userData.accessToken
+                    return config;
+                },
+                error => {
+                    console.log(error)
+                }
+            )
         }
 
-        apiClient.interceptors.request.use(
-            config => {
-                config.headers["Token"] = state.userData.accessToken
-                return config;
-            },
-            error => {
-                console.log(error)
-            }
-        )
-    }, [state, tknDetails])
+    }, [state.userData.accessToken])
 
     // TODO: revisited this auth flow when getting closer to prod
     const login = async (e: Event, payload: UserAuthDetails ) => {
