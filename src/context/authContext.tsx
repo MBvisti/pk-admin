@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {AuthState, UserAuthDetails, UserData} from "./interfaces";
-import {endpoints} from "../http/api";
+import {apiClient, endpoints} from "../http/api";
 
 const AuthContext = React.createContext({});
 export const useAuth = () => React.useContext(AuthContext);
@@ -42,43 +42,9 @@ const AuthProvider = (props: any) => {
     //     // 	// eslint-disable-next-line react-hooks/exhaustive-deps
     // }, [])
 
-    // const login = async (mail, password) => {
-    //     const loginData = {
-    //         mail,
-    //         password
-    //     }
-    //
-    //     setState({
-    //         ...state,
-    //         status: 'loading',
-    //     })
-    //
-    //     const res = await api.authentication("login").userLogin(JSON.stringify(loginData))
-    //
-    //     console.log(res);
-    //
-    //     setState({
-    //         userData: {
-    //             name: res.data.userName,
-    //             accessToken: res.data.accessToken
-    //         },
-    //         status: 'success',
-    //         error: null,
-    //     })
-    //
-    //     apiClient.interceptors.request.use(
-    //         config => {
-    //             config.headers['Authorization'] = 'Bearer ' + res.data.accessToken;
-    //             return config;},
-    //         error => {
-    //             console.log(error)
-    //         });
-    // }
-
+    // TODO: add cookie to store token that can then be used to authenticate while active
     const login = async (e: Event, payload: UserAuthDetails ) => {
         e.preventDefault()
-
-        console.log(payload)
 
         const res = await endpoints.authentication().userLogin(payload)
 
@@ -87,27 +53,35 @@ const AuthProvider = (props: any) => {
             loading: true,
         })
 
-        setTimeout(() => {
+        if (res.status === 200 && res.headers["token"].length !== 0) {
             setState({
                 ...state,
                 userData: {
-                    name: payload.username,
-                    accessToken: payload.password,
+                    name: res.data.name,
+                    accessToken: res.headers["token"],
                     isAuthenticated: true,
                 },
                 loading: false
             })
-        }, 4000)
 
-        // apiClient.interceptors.request.use(
-        //     config => {
-        //         config.headers["Token"] = res.data.token
-        //         return config;
-        //     },
-        //     error => {
-        //         console.log(error)
-        //     }
-        // )
+            apiClient.interceptors.request.use(
+                config => {
+                    config.headers["Token"] = res.headers["token"]
+                    return config;
+                },
+                error => {
+                    console.log(error)
+                }
+            )
+        }
+
+        if (res.status !== 200 && res.headers["token"].length === undefined) {
+            console.log("Hello?")
+            setState({
+                ...state,
+                loading: false
+            })
+        }
     }
 
     // const logout = async () => {
