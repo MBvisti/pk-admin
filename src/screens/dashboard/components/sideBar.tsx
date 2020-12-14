@@ -31,7 +31,7 @@ export const SideBar = () => {
     return (
         <div className="md:w-80 md:flex md:flex-col md:max-h-screen md:bg-gray-600 md:overflow-y-hidden md:flex-none">
             <img className="md:px-10 md:mt-6" src="https://parkeringskompagniet.dk/wp-content/uploads/2020/10/logologo-800x355-1-400x106.png" alt="parkeringskompagniet logo" />
-            <div className="md:mt-12 md:pl-10 md:relative md:overflow-y-scroll">
+            <div className="md:mt-12 md:pl-10 md:relative md:overflow-auto">
                 <SideBarElement
                     handleActiveElement={(e: Event) => handleActiveElement(e)}
                     icon={<AiOutlineHome className="md:mr-4 md:h-6 md:w-6 md:stroke-current md:text-white" />}
