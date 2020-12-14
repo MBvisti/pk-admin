@@ -1,4 +1,5 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
+import Cookies from 'js-cookie';
 import {AuthState, UserAuthDetails, UserData} from "./interfaces";
 import {apiClient, endpoints} from "../http/api";
 
@@ -16,33 +17,35 @@ const AuthProvider = (props: any) => {
         error: null
     })
 
-    // useEffect(() => {
-    //     api.authentication("refresh-token").refreshToken()
-    //         .then(res => {
-    //             console.log(res)
-    //             setState( state => ({
-    //                 ...state,
-    //                 userData: {
-    //                     name: res.data.userName,
-    //                     accessToken: res.data.accessToken
-    //                 }
-    //             }))
-    //             apiClient.interceptors.request.use(
-    //                 config => {
-    //                     config.headers['Authorization'] = 'Bearer ' + res.data.accessToken;
-    //                     return config;
-    //                 },
-    //                 error => {
-    //                     console.log(error)
-    //                 })
-    //         })
-    //         .catch(err => {
-    //             console.log(err);
-    //         })
-    //     // 	// eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [])
+    const tknDetails = Cookies.getJSON("pk-admin")
 
-    // TODO: add cookie to store token that can then be used to authenticate while active
+    // TODO: revisited this auth flow when getting closer to prod
+    useEffect(() => {
+        if (tknDetails) {
+            console.log(tknDetails["tknExpiry"] > Date.now())
+            setState({
+                ...state,
+                userData: {
+                    name: tknDetails.name,
+                    accessToken: tknDetails["token"],
+                    isAuthenticated: true,
+                },
+                loading: false
+            })
+        }
+
+        apiClient.interceptors.request.use(
+            config => {
+                config.headers["Token"] = state.userData.accessToken
+                return config;
+            },
+            error => {
+                console.log(error)
+            }
+        )
+    }, [])
+
+    // TODO: revisited this auth flow when getting closer to prod
     const login = async (e: Event, payload: UserAuthDetails ) => {
         e.preventDefault()
 
@@ -73,6 +76,13 @@ const AuthProvider = (props: any) => {
                     console.log(error)
                 }
             )
+
+            // set a cookie with token details
+            Cookies.set("pk-admin", {
+                token: res.headers["token"],
+                name: res.data.name,
+                tknExpiry: res.headers["tokenexpiry"]
+            })
         }
 
         if (res.status !== 200 && res.headers["token"].length === undefined) {
@@ -84,26 +94,28 @@ const AuthProvider = (props: any) => {
         }
     }
 
-    // const logout = async () => {
-    //     const res = await api.authentication("logout").logout()
-    //
-    //     if (res.status === 200) {
-    //         setState({
-    //             userData: {
-    //                 name: "",
-    //                 accessToken: ""
-    //             },
-    //             status: 'pending',
-    //             error: null
-    //         })
-    //     }
-    // }
+    // TODO: revisit this
+    const logout = async () => {
+        // remove the pk-admin cookie
+        Cookies.remove("pk-admin")
+
+        // reset state (just for good measure)
+        setState({
+            userData: {
+                accessToken: "",
+                name: "",
+                isAuthenticated: false,
+            },
+            loading: false,
+            error: null,
+        })
+    }
 
     const userData = state.userData as UserData;
     const loadingState = state.loading;
 
     return (
-        <AuthContext.Provider value={{userData, login, loadingState}} {...props} />
+        <AuthContext.Provider value={{userData, login, loadingState, logout}} {...props} />
     );
 }
 
