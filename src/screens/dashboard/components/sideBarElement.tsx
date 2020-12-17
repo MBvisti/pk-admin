@@ -32,7 +32,9 @@ export const SideBarElement = ({
         setIsOpen(!isOpen);
       }}
       className={`text-white cursor-pointer md:mb-2 md:flex md:flex-col md:min-w-full ${
-        isActive ? "md:border-r-8 md:border-pk-blue" : ""
+        isActive
+          ? "md:border-r-8 md:border-t-0 md:border-l-0 md:border-b-0 md:border-pk-blue"
+          : ""
       }`}
     >
       <Link to={`/${elementName === "dashboard" ? "" : elementName}`}>
