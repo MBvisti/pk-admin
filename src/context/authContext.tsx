@@ -1,124 +1,149 @@
-import React, {useEffect, useState} from 'react';
-import Cookies from 'js-cookie';
-import {AuthState, UserAuthDetails, UserData} from "./interfaces";
-import {apiClient, endpoints} from "../http/api";
+import React, { useEffect, useState } from "react";
+import Cookies from "js-cookie";
+import {
+  AuthFunctions,
+  AuthState,
+  UserAuthDetails,
+  UserData,
+} from "./interfaces";
+import { apiClient, endpoints } from "../http/api";
 
 const AuthContext = React.createContext({});
 export const useAuth = () => React.useContext(AuthContext);
 
 const AuthProvider = (props: any) => {
-    const [state, setState] = useState<AuthState>({
+  const [state, setState] = useState<AuthState>({
+    userData: {
+      name: "",
+      accessToken: "",
+      isAuthenticated: false,
+    },
+    loading: false,
+    error: null,
+  });
+
+  // TODO: revisited this auth flow when getting closer to prod
+  useEffect(() => {
+    const tknDetails = Cookies.getJSON("pk-admin");
+    if (tknDetails) {
+      console.log(tknDetails["tknExpiry"] > Date.now());
+      setState((s) => ({
+        ...s,
         userData: {
-            name: "",
-            accessToken: "",
-            isAuthenticated: false,
+          name: tknDetails.name,
+          accessToken: tknDetails["token"],
+          isAuthenticated: true,
         },
         loading: false,
-        error: null
-    })
+      }));
 
-    // TODO: revisited this auth flow when getting closer to prod
-    useEffect(() => {
-        const tknDetails = Cookies.getJSON("pk-admin")
-        if (tknDetails) {
-            console.log(tknDetails["tknExpiry"] > Date.now())
-            setState(s => ({
-                ...s,
-                userData: {
-                    name: tknDetails.name,
-                    accessToken: tknDetails["token"],
-                    isAuthenticated: true,
-                },
-                loading: false
-            }))
-
-            apiClient.interceptors.request.use(
-                config => {
-                    config.headers["Token"] = state.userData.accessToken
-                    return config;
-                },
-                error => {
-                    console.log(error)
-                }
-            )
+      apiClient.interceptors.request.use(
+        (config) => {
+          config.headers["Token"] = state.userData.accessToken;
+          return config;
+        },
+        (error) => {
+          console.log(error);
         }
-
-    }, [state.userData.accessToken])
-
-    // TODO: revisited this auth flow when getting closer to prod
-    const login = async (e: Event, payload: UserAuthDetails ) => {
-        e.preventDefault()
-
-        const res = await endpoints.authentication().userLogin(payload)
-
-        setState({
-            ...state,
-            loading: true,
-        })
-
-        if (res.status === 200 && res.headers["token"].length !== 0) {
-            setState({
-                ...state,
-                userData: {
-                    name: res.data.user.name,
-                    accessToken: res.headers["token"],
-                    isAuthenticated: true,
-                },
-                loading: false
-            })
-
-            apiClient.interceptors.request.use(
-                config => {
-                    config.headers["Token"] = res.headers["token"]
-                    return config;
-                },
-                error => {
-                    console.log(error)
-                }
-            )
-
-            console.log(res.data)
-
-            // set a cookie with token details
-            Cookies.set("pk-admin", {
-                token: res.headers["token"],
-                name: res.data.user.name,
-                tknExpiry: res.headers["tokenexpiry"]
-            })
-        }
-
-        if (res.status !== 200 && res.headers["token"].length === undefined) {
-            console.log("Hello?")
-            setState({
-                ...state,
-                loading: false
-            })
-        }
+      );
     }
+  }, [state.userData.accessToken]);
 
-    // TODO: revisit this
-    const logout = async () => {
-        // remove the pk-admin cookie
-        Cookies.remove("pk-admin")
+  // TODO: revisited this auth flow when getting closer to prod
+  const login = async (e: React.FormEvent, payload: UserAuthDetails) => {
+    e.preventDefault();
 
-        // reset state (just for good measure)
-        setState({
-            userData: {
-                accessToken: "",
-                name: "",
-                isAuthenticated: false,
-            },
-            loading: false,
-            error: null,
-        })
+    const res = await endpoints.authentication().userLogin(payload);
+
+    setState({
+      ...state,
+      loading: true,
+    });
+
+    if (res.message === "Request failed with status code 500") {
+      setState({
+        ...state,
+        loading: false,
+        error: res.message,
+      });
+
+      return;
     }
+    if (res !== undefined) {
+      if (
+        res.headers["token"].length === undefined ||
+        res.headers["token"].length === 0
+      ) {
+        setState({
+          ...state,
+          loading: false,
+          error:
+            "There was an error requesting data - please refresh and try again",
+        });
+      }
 
-    const userData = state.userData as UserData;
-    const loadingState = state.loading;
+      if (res.status === 200 && res.headers["token"].length !== 0) {
+        setState({
+          ...state,
+          userData: {
+            name: res.data.user.name,
+            accessToken: res.headers["token"],
+            isAuthenticated: true,
+          },
+          loading: false,
+          error: "no errors",
+        });
 
-    return (
-        <AuthContext.Provider value={{userData, login, loadingState, logout}} {...props} />
-    );
-}
+        apiClient.interceptors.request.use(
+          (config) => {
+            config.headers["Token"] = res.headers["token"];
+            return config;
+          },
+          (error) => {
+            console.log(error);
+          }
+        );
+        // set a cookie with token details
+        Cookies.set("pk-admin", {
+          token: res.headers["token"],
+          name: res.data.user.name,
+          tknExpiry: res.headers["tokenexpiry"],
+        });
+      }
+    }
+  };
+
+  // TODO: revisit this
+  const logout = async () => {
+    // remove the pk-admin cookie
+    Cookies.remove("pk-admin");
+
+    // reset state (just for good measure)
+    setState({
+      userData: {
+        accessToken: "",
+        name: "",
+        isAuthenticated: false,
+      },
+      loading: false,
+      error: null,
+    });
+  };
+
+  const userData = state.userData as UserData;
+  const loadingState = state.loading;
+  const error = state.error;
+  const authFunctions: AuthFunctions = {
+    login,
+    logout,
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{ userData, loadingState, authFunctions, error }}
+      {...props}
+    />
+  );
+};
 
 export default AuthProvider;
