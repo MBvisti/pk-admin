@@ -28,7 +28,6 @@ const AuthProvider = (props: any) => {
   useEffect(() => {
     const tknDetails = Cookies.getJSON("pk-admin") as PkCookie;
     if (tknDetails) {
-      console.log(tknDetails.tknExpiry);
       setState((s) => ({
         ...s,
         userData: {
@@ -42,13 +41,14 @@ const AuthProvider = (props: any) => {
 
       apiClient.interceptors.request.use(
         (config) => {
-          config.headers["Token"] = state.userData.accessToken;
+          config.headers["Token"] = tknDetails.token;
           return config;
         },
         (error) => {
           console.log(error);
         }
       );
+      console.log(state);
     }
   }, [state.userData.accessToken]);
 

@@ -18,6 +18,15 @@ export const endpoints = {
       apiStatus: () => apiClient.get(url),
     };
   },
+  user() {
+    return {
+      getMemberParkingIds: (userID: Number) =>
+        apiClient
+          .get(`/user/memberParkingIds/${userID} `)
+          .then((res) => res)
+          .catch((err) => err.toJSON()),
+    };
+  },
   authentication() {
     return {
       userLogin: (userDetails: UserAuthDetails) =>
@@ -29,6 +38,48 @@ export const endpoints = {
           .catch((err) => {
             return err.toJSON();
           }),
+    };
+  },
+  parkingFee() {
+    return {
+      paginatedFee: (addressID: Array<number>) =>
+        apiClient
+          .post(
+            "/parkingFees/paginatedFees",
+            JSON.stringify({ addressIds: [...addressID] })
+          )
+          .then((res) => res)
+          .catch((err) => {
+            console.log(err.toJSON());
+          }),
+    };
+  },
+  parkingAddress() {
+    return {
+      getAddresses: (userID: number) =>
+        apiClient
+          .post(
+            "/addresses/paginatedAddresses",
+            JSON.stringify({ userId: userID })
+          )
+          .then((res) => res)
+          .catch((err) => {
+            console.log(err.toJSON());
+          }),
+    };
+  },
+  feeHistory() {
+    return {
+      getFees: (userID: number) => {
+        apiClient
+          .get(`/feeHistory/fee`)
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((err) => {
+            return err.toJSON();
+          });
+      },
     };
   },
 };
