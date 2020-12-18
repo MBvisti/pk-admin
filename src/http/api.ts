@@ -1,26 +1,34 @@
-import axios from 'axios';
+import axios from "axios";
 
 // Import config
-import { axiosConfig } from './config';
-import {UserAuthDetails} from "../context/interfaces";
+import { axiosConfig } from "./config";
+import { UserAuthDetails } from "../context/interfaces";
 
 export const apiClient = axios.create({
-    baseURL: axiosConfig.baseURL,
-    headers: {
-        "Content-Type": "application/json",
-    },
-    timeout: axiosConfig.timeout
+  baseURL: axiosConfig.baseURL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+  timeout: axiosConfig.timeout,
 });
 
 export const endpoints = {
-    status(url: string) {
-        return {
-            apiStatus: () => apiClient.get(url),
-        }
-    },
-    authentication() {
-        return {
-            userLogin: (userDetails: UserAuthDetails) => apiClient.post("/Login/Authenticate", JSON.stringify(userDetails)),
-        }
-    }
-}
+  status(url: string) {
+    return {
+      apiStatus: () => apiClient.get(url),
+    };
+  },
+  authentication() {
+    return {
+      userLogin: (userDetails: UserAuthDetails) =>
+        apiClient
+          .post(
+            "/Login/Authenticate/?initialData=true",
+            JSON.stringify(userDetails)
+          )
+          .catch((err) => {
+            return err.toJSON();
+          }),
+    };
+  },
+};
