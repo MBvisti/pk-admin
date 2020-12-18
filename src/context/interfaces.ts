@@ -2,6 +2,7 @@ export interface UserData {
   name: string;
   accessToken: string;
   isAuthenticated: boolean;
+  userID: number;
 }
 
 export interface AuthData {
@@ -25,4 +26,11 @@ export interface AuthState {
   userData: UserData;
   loading: boolean;
   error: string | null;
+}
+
+export interface PkCookie {
+  name: string;
+  token: string;
+  tknExpiry: string;
+  userID: number;
 }

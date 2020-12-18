@@ -5,6 +5,7 @@ import {
   AuthState,
   UserAuthDetails,
   UserData,
+  PkCookie,
 } from "./interfaces";
 import { apiClient, endpoints } from "../http/api";
 
@@ -17,6 +18,7 @@ const AuthProvider = (props: any) => {
       name: "",
       accessToken: "",
       isAuthenticated: false,
+      userID: 0,
     },
     loading: false,
     error: null,
@@ -24,15 +26,16 @@ const AuthProvider = (props: any) => {
 
   // TODO: revisited this auth flow when getting closer to prod
   useEffect(() => {
-    const tknDetails = Cookies.getJSON("pk-admin");
+    const tknDetails = Cookies.getJSON("pk-admin") as PkCookie;
     if (tknDetails) {
-      console.log(tknDetails["tknExpiry"] > Date.now());
+      console.log(tknDetails.tknExpiry);
       setState((s) => ({
         ...s,
         userData: {
           name: tknDetails.name,
-          accessToken: tknDetails["token"],
+          accessToken: tknDetails.token,
           isAuthenticated: true,
+          userID: tknDetails.userID,
         },
         loading: false,
       }));
@@ -90,6 +93,7 @@ const AuthProvider = (props: any) => {
             name: res.data.user.name,
             accessToken: res.headers["token"],
             isAuthenticated: true,
+            userID: res.data.user.id,
           },
           loading: false,
           error: "no errors",
@@ -109,6 +113,7 @@ const AuthProvider = (props: any) => {
           token: res.headers["token"],
           name: res.data.user.name,
           tknExpiry: res.headers["tokenexpiry"],
+          userID: res.data.user.id,
         });
       }
     }
@@ -125,6 +130,7 @@ const AuthProvider = (props: any) => {
         accessToken: "",
         name: "",
         isAuthenticated: false,
+        userID: 0,
       },
       loading: false,
       error: null,
