@@ -60,6 +60,7 @@ const AuthProvider = (props: any) => {
       loading: true,
     });
 
+    // TODO: very fragile will have to revisit - but works for now
     if (res.message === "Request failed with status code 500") {
       setState({
         ...state,
