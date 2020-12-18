@@ -20,7 +20,7 @@ const App: React.FC = () => {
   return (
     <Suspense fallback={<LoadingScreen />}>
       {/* TODO: letting all through for now  */}
-      {!isAuth ? (
+      {isAuth ? (
         <Admin userName={data.userData.name} />
       ) : (
         <Login isLoading={data.loadingState} />
