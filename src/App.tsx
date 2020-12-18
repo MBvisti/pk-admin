@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useEffect, useState } from "react";
-import { AuthPayload } from "./context/interfaces";
+import { AuthData } from "./context/interfaces";
 import { useAuth } from "./context/authContext";
 import { LoadingScreen } from "./screens/loadingScreen";
 
@@ -9,7 +9,7 @@ const Login = lazy(() => import("./screens/login"));
 const App: React.FC = () => {
   const [isAuth, setIsAuth] = useState(false);
   // TODO: when api docs are ready adding in authentication setup
-  const data = useAuth() as AuthPayload;
+  const data = useAuth() as AuthData;
 
   useEffect(() => {
     setIsAuth(data.userData.isAuthenticated);
