@@ -6,6 +6,7 @@ import {
   UserAuthDetails,
   UserData,
 } from "./interfaces";
+
 import { apiClient, endpoints } from "../http/api";
 
 const AuthContext = React.createContext({});
