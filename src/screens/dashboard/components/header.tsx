@@ -5,7 +5,7 @@ import { endpoints } from "../../../http/api";
 
 import { AiOutlineLogout, AiOutlineUser } from "react-icons/ai";
 import { useAuth } from "../../../context/authContext";
-import { AuthFunctions } from "../../../context/interfaces";
+import { AuthData } from "../../../context/interfaces";
 
 interface HeaderProps {
   userName: string;
@@ -14,7 +14,8 @@ interface HeaderProps {
 export const Header = ({ userName }: HeaderProps) => {
   const { isLoading, data } = useQuery("status", endpoints.status().apiStatus);
 
-  const authData = useAuth() as AuthFunctions;
+  const authRes = useAuth() as AuthData;
+
   return (
     <div className="md:h-14 md:mt-6 md:flex md:justify-between md:items-center">
       <p>
@@ -34,7 +35,7 @@ export const Header = ({ userName }: HeaderProps) => {
           <p className="text-sm">{userName}</p>
         </span>
         <AiOutlineLogout
-          onClick={() => authData.logout()}
+          onClick={() => authRes.authFunctions.logout()}
           className="cursor-pointer"
         />
       </div>
