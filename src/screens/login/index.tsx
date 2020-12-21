@@ -18,9 +18,8 @@ function Login({ isLoading }: LoginProps) {
     username: "",
     loading: isLoading,
   });
-  const authRes = useAuth() as AuthData;
 
-  console.log(authRes);
+  const authRes = useAuth() as AuthData;
 
   const handleFormInput = (e: ChangeEvent): void => {
     const { name, value } = e.target as HTMLInputElement;

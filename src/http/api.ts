@@ -1,8 +1,10 @@
-import axios from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
+import { useQuery } from "react-query";
 
 // Import config
 import { axiosConfig } from "./config";
 import { UserAuthDetails } from "../context/interfaces";
+import { error } from "console";
 
 export const apiClient = axios.create({
   baseURL: axiosConfig.baseURL,
@@ -13,73 +15,20 @@ export const apiClient = axios.create({
 });
 
 export const endpoints = {
-  status(url: string) {
+  status() {
     return {
-      apiStatus: () => apiClient.get(url),
-    };
-  },
-  user() {
-    return {
-      getMemberParkingIds: (userID: Number) =>
-        apiClient
-          .get(`/user/memberParkingIds/${userID} `)
-          .then((res) => res)
-          .catch((err) => err.toJSON()),
-    };
-  },
-  authentication() {
-    return {
-      userLogin: (userDetails: UserAuthDetails) =>
-        apiClient
-          .post(
-            "/Login/Authenticate/?initialData=true",
-            JSON.stringify(userDetails)
-          )
-          .catch((err) => {
-            return err.toJSON();
-          }),
-    };
-  },
-  parkingFee() {
-    return {
-      paginatedFee: (addressID: Array<number>) =>
-        apiClient
-          .post(
-            "/parkingFees/paginatedFees",
-            JSON.stringify({ addressIds: [...addressID] })
-          )
-          .then((res) => res)
-          .catch((err) => {
-            console.log(err.toJSON());
-          }),
-    };
-  },
-  parkingAddress() {
-    return {
-      getAddresses: (userID: number) =>
-        apiClient
-          .post(
-            "/addresses/paginatedAddresses",
-            JSON.stringify({ userId: userID })
-          )
-          .then((res) => res)
-          .catch((err) => {
-            console.log(err.toJSON());
-          }),
-    };
-  },
-  feeHistory() {
-    return {
-      getFees: (userID: number) => {
-        apiClient
-          .get(`/feeHistory/fee`)
-          .then((res) => {
-            console.log(res);
-          })
-          .catch((err) => {
-            return err.toJSON();
-          });
+      apiStatus: async () => {
+        const res = await apiClient.get("/alive");
+        return res;
       },
     };
   },
+};
+
+export const authentication = {
+  userLogin: (userDetails: UserAuthDetails) =>
+    apiClient.post(
+      "/Login/Authenticate/?initialData=true",
+      JSON.stringify(userDetails)
+    ),
 };

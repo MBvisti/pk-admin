@@ -5,9 +5,10 @@ import {
   AuthState,
   UserAuthDetails,
   UserData,
-  PkCookie,
 } from "./interfaces";
-import { apiClient, endpoints } from "../http/api";
+
+import { apiClient, endpoints, authentication } from "../http/api";
+import { AxiosError, AxiosResponse } from "axios";
 
 const AuthContext = React.createContext({});
 export const useAuth = () => React.useContext(AuthContext);
@@ -18,7 +19,6 @@ const AuthProvider = (props: any) => {
       name: "",
       accessToken: "",
       isAuthenticated: false,
-      userID: 0,
     },
     loading: false,
     error: null,
@@ -26,29 +26,28 @@ const AuthProvider = (props: any) => {
 
   // TODO: revisited this auth flow when getting closer to prod
   useEffect(() => {
-    const tknDetails = Cookies.getJSON("pk-admin") as PkCookie;
+    const tknDetails = Cookies.getJSON("pk-admin");
     if (tknDetails) {
+      console.log(tknDetails["tknExpiry"] > Date.now());
       setState((s) => ({
         ...s,
         userData: {
           name: tknDetails.name,
-          accessToken: tknDetails.token,
+          accessToken: tknDetails["token"],
           isAuthenticated: true,
-          userID: tknDetails.userID,
         },
         loading: false,
       }));
 
       apiClient.interceptors.request.use(
         (config) => {
-          config.headers["Token"] = tknDetails.token;
+          config.headers["Token"] = state.userData.accessToken;
           return config;
         },
         (error) => {
           console.log(error);
         }
       );
-      console.log(state);
     }
   }, [state.userData.accessToken]);
 
@@ -56,66 +55,53 @@ const AuthProvider = (props: any) => {
   const login = async (e: React.FormEvent, payload: UserAuthDetails) => {
     e.preventDefault();
 
-    const res = await endpoints.authentication().userLogin(payload);
-
     setState({
       ...state,
       loading: true,
     });
 
-    // TODO: very fragile will have to revisit - but works for now
-    if (res.message === "Request failed with status code 500") {
+    try {
+      const res = await authentication.userLogin(payload);
+
       setState({
         ...state,
+        userData: {
+          name: res.data.user.name,
+          accessToken: res.headers["token"],
+          isAuthenticated: true,
+        },
         loading: false,
-        error: res.message,
+        error: "no errors",
       });
 
-      return;
-    }
-    if (res !== undefined) {
-      if (
-        res.headers["token"].length === undefined ||
-        res.headers["token"].length === 0
-      ) {
-        setState({
-          ...state,
-          loading: false,
-          error:
-            "There was an error requesting data - please refresh and try again",
-        });
-      }
-
-      if (res.status === 200 && res.headers["token"].length !== 0) {
-        setState({
-          ...state,
-          userData: {
-            name: res.data.user.name,
-            accessToken: res.headers["token"],
-            isAuthenticated: true,
-            userID: res.data.user.id,
-          },
-          loading: false,
-          error: "no errors",
-        });
-
-        apiClient.interceptors.request.use(
-          (config) => {
-            config.headers["Token"] = res.headers["token"];
-            return config;
-          },
-          (error) => {
-            console.log(error);
-          }
-        );
-        // set a cookie with token details
-        Cookies.set("pk-admin", {
+      apiClient.interceptors.request.use(
+        (config) => {
+          config.headers["Token"] = res.headers["token"];
+          return config;
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+      // set a cookie with token details
+      Cookies.set(
+        "pk-admin",
+        {
           token: res.headers["token"],
           name: res.data.user.name,
           tknExpiry: res.headers["tokenexpiry"],
-          userID: res.data.user.id,
-        });
-      }
+        },
+        {
+          sameSite: "None",
+          secure: true,
+        }
+      );
+    } catch (err) {
+      setState({
+        ...state,
+        loading: false,
+        error: "You've provided the wrong username or password",
+      });
     }
   };
 
@@ -130,7 +116,6 @@ const AuthProvider = (props: any) => {
         accessToken: "",
         name: "",
         isAuthenticated: false,
-        userID: 0,
       },
       loading: false,
       error: null,
