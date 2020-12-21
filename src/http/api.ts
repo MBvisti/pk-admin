@@ -1,8 +1,10 @@
-import axios from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
+import { useQuery } from "react-query";
 
 // Import config
 import { axiosConfig } from "./config";
 import { UserAuthDetails } from "../context/interfaces";
+import { error } from "console";
 
 export const apiClient = axios.create({
   baseURL: axiosConfig.baseURL,
@@ -13,22 +15,20 @@ export const apiClient = axios.create({
 });
 
 export const endpoints = {
-  status(url: string) {
+  status() {
     return {
-      apiStatus: () => apiClient.get(url),
+      apiStatus: async () => {
+        const res = await apiClient.get("/alive");
+        return res;
+      },
     };
   },
-  authentication() {
-    return {
-      userLogin: (userDetails: UserAuthDetails) =>
-        apiClient
-          .post(
-            "/Login/Authenticate/?initialData=true",
-            JSON.stringify(userDetails)
-          )
-          .catch((err) => {
-            return err.toJSON();
-          }),
-    };
-  },
+};
+
+export const authentication = {
+  userLogin: (userDetails: UserAuthDetails) =>
+    apiClient.post(
+      "/Login/Authenticate/?initialData=true",
+      JSON.stringify(userDetails)
+    ),
 };
