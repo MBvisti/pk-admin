@@ -21,8 +21,6 @@ const App: React.FC = () => {
     setIsAuth(data.userData.isAuthenticated);
   }, [data.userData.isAuthenticated]);
 
-  console.log(data);
-
   return (
     <Suspense fallback={<LoadingScreen />}>
       {/* TODO: letting all through for now  */}
