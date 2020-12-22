@@ -81,6 +81,7 @@ interface FeeData {
   regNo: string;
   userEmail: string;
   userId: number;
+  id: number;
 }
 
 interface HomeState {
@@ -109,92 +110,97 @@ export const Home = () => {
   });
 
   useEffect(() => {
-    setState((s) => ({
-      ...s,
-      loading: true,
-    }));
-    paginatedAddressMutation.mutate(
-      { userId: 17 },
-      {
-        onSuccess: (data, { userId }) => {
-          setState((s) => ({
-            ...s,
-            loading: paginatedFees.isLoading,
-          }));
-          let addressData: Array<Address> = [];
+    const setupData = () => {
+      setState((s) => ({
+        ...s,
+        loading: true,
+      }));
+      paginatedAddressMutation.mutate(
+        { userId: 17 },
+        {
+          onSuccess: (data, { userId }) => {
+            setState((s) => ({
+              ...s,
+              loading: paginatedFees.isLoading,
+            }));
+            let addressData: Array<Address> = [];
 
-          data.results.forEach((address: Address) => {
-            addressData.push({
-              city: address.city,
-              id: address.id,
-              ownerId: address.ownerId,
-              street: address.street,
-              streetNumber: address.streetNumber,
-              zipCode: address.zipCode,
+            data.results.forEach((address: Address) => {
+              addressData.push({
+                city: address.city,
+                id: address.id,
+                ownerId: address.ownerId,
+                street: address.street,
+                streetNumber: address.streetNumber,
+                zipCode: address.zipCode,
+              });
             });
-          });
 
-          setState((s) => ({
-            ...s,
-            addressData,
-          }));
+            setState((s) => ({
+              ...s,
+              addressData,
+            }));
 
-          paginatedFees.mutate(
-            { userId },
-            {
-              onSuccess: (data: PaginatedFees) => {
-                let feeData: Array<FeeData> = [];
+            paginatedFees.mutate(
+              { userId },
+              {
+                onSuccess: (data: PaginatedFees) => {
+                  let feeData: Array<FeeData> = [];
 
-                data.results.forEach((fee, index) => {
-                  const feeAddress = addressData.filter(
-                    (address) => address.id === fee.addressId
-                  );
+                  data.results.forEach((fee, index) => {
+                    const feeAddress = addressData.filter(
+                      (address) => address.id === fee.addressId
+                    );
 
-                  if (feeAddress[0].city === "Test") {
-                    return;
-                  }
+                    if (feeAddress[0].city === "Test") {
+                      return;
+                    }
 
-                  const dateObj = new Date(fee.endDate);
-                  const fullEndDate =
-                    dateObj.getDay() +
-                    "/" +
-                    dateObj.getMonth() +
-                    "/" +
-                    dateObj.getUTCFullYear();
+                    const dateObj = new Date(fee.endDate);
+                    const fullEndDate =
+                      dateObj.getDay() +
+                      "/" +
+                      dateObj.getMonth() +
+                      "/" +
+                      dateObj.getUTCFullYear();
 
-                  if (feeAddress[0]) {
-                    const formattedFee: FeeData = {
-                      city: feeAddress[0].city,
-                      street: feeAddress[0].street.trimEnd(),
-                      zipCode: feeAddress[0].zipCode,
-                      streetCode: feeAddress[0].streetNumber,
-                      cost: fee.cost,
-                      countryCode: fee.countryCode,
-                      endDate: fullEndDate,
-                      regNo: fee.regNo,
-                      userEmail: fee.userEmail,
-                      createdBy: fee.createdBy,
-                      userId: fee.userId,
-                      createdTimestamp: fee.createdTimestamp,
-                    };
+                    if (feeAddress[0]) {
+                      const formattedFee: FeeData = {
+                        city: feeAddress[0].city,
+                        street: feeAddress[0].street.trimEnd(),
+                        zipCode: feeAddress[0].zipCode,
+                        streetCode: feeAddress[0].streetNumber,
+                        cost: fee.cost,
+                        countryCode: fee.countryCode,
+                        endDate: fullEndDate,
+                        regNo: fee.regNo,
+                        userEmail: fee.userEmail,
+                        id: fee.id,
+                        createdBy: fee.createdBy,
+                        userId: fee.userId,
+                        createdTimestamp: fee.createdTimestamp,
+                      };
 
-                    feeData.push(formattedFee);
-                  }
-                });
+                      feeData.push(formattedFee);
+                    }
+                  });
 
-                setState((s) => ({
-                  ...s,
-                  feeData,
-                  loading: false,
-                  addressData,
-                }));
-              },
-            }
-          );
-        },
-      }
-    );
-  }, [paginatedAddressMutation, paginatedFees]);
+                  setState((s) => ({
+                    ...s,
+                    feeData,
+                    loading: false,
+                    addressData,
+                  }));
+                },
+              }
+            );
+          },
+        }
+      );
+    };
+    setupData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <div className="md:flex md:flex-col">
       <div className="md:flex md:flex-col">
@@ -216,7 +222,10 @@ export const Home = () => {
           ) : (
             state.feeData.slice(state.start, state.end).map((fee) => {
               return (
-                <div className="md:flex md:justify-between md:items-center md:py-2 md:px-4 md:border-b md:border-pk-dark-gray md:mt-2 md:cursor-pointer">
+                <div
+                  key={fee.id}
+                  className="md:flex md:justify-between md:items-center md:py-2 md:px-4 md:border-b md:border-pk-dark-gray md:mt-2 md:cursor-pointer"
+                >
                   <p className="md:text-sm md:w-1/3">{fee.regNo}</p>
                   <p className="md:text-sm md:flex-1">
                     {fee.street +
