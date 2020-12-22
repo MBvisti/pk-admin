@@ -31,7 +31,7 @@ function Admin({ userName }: AdminProps) {
   });
 
   return (
-    <div className="md:flex md:min-h-screen md:min-w-full md:max-w-full">
+    <div className="md:flex md:min-h-screen md:max-h-screen md:min-w-full md:max-w-full md:overflow-hidden">
       <Router>
         <SideBar />
         <div className="md:flex-grow md:bg-pk-light-gray md:px-8">
