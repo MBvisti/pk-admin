@@ -1,10 +1,8 @@
-import axios, { AxiosError, AxiosResponse } from "axios";
-import { useQuery } from "react-query";
+import axios from "axios";
 
 // Import config
 import { axiosConfig } from "./config";
 import { UserAuthDetails } from "../context/interfaces";
-import { error } from "console";
 
 export const apiClient = axios.create({
   baseURL: axiosConfig.baseURL,

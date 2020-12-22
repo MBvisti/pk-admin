@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation } from "react-query";
 import { endpoints } from "../../../http/api";
 
 interface PaginatedFees {
@@ -109,18 +109,18 @@ export const Home = () => {
   });
 
   useEffect(() => {
-    setState({
-      ...state,
+    setState((s) => ({
+      ...s,
       loading: true,
-    });
+    }));
     paginatedAddressMutation.mutate(
       { userId: 17 },
       {
         onSuccess: (data, { userId }) => {
-          setState({
-            ...state,
+          setState((s) => ({
+            ...s,
             loading: paginatedFees.isLoading,
-          });
+          }));
           let addressData: Array<Address> = [];
 
           data.results.forEach((address: Address) => {
@@ -134,10 +134,10 @@ export const Home = () => {
             });
           });
 
-          setState({
-            ...state,
+          setState((s) => ({
+            ...s,
             addressData,
-          });
+          }));
 
           paginatedFees.mutate(
             { userId },
@@ -150,23 +150,7 @@ export const Home = () => {
                     (address) => address.id === fee.addressId
                   );
 
-                  console.log(fee);
-
                   if (feeAddress[0].city === "Test") {
-                    // const formattedFee: FeeData = {
-                    //   city: "no data",
-                    //   street: "no data",
-                    //   zipCode: "no data",
-                    //   streetCode: "no data",
-                    //   cost: fee.cost,
-                    //   countryCode: fee.countryCode,
-                    //   endDate: fee.endDate,
-                    //   regNo: fee.regNo,
-                    //   userEmail: fee.userEmail,
-                    //   userId: fee.userId,
-                    // };
-
-                    // feeData.push(formattedFee);
                     return;
                   }
 
@@ -177,8 +161,6 @@ export const Home = () => {
                     dateObj.getMonth() +
                     "/" +
                     dateObj.getUTCFullYear();
-
-                  console.log(fullEndDate);
 
                   if (feeAddress[0]) {
                     const formattedFee: FeeData = {
@@ -200,25 +182,19 @@ export const Home = () => {
                   }
                 });
 
-                setState({
-                  ...state,
+                setState((s) => ({
+                  ...s,
                   feeData,
                   loading: false,
                   addressData,
-                });
+                }));
               },
             }
           );
         },
       }
     );
-  }, []);
-
-  const queryClient = useQueryClient();
-
-  queryClient.setQueryData("test", { state });
-
-  console.log(state);
+  }, [paginatedAddressMutation, paginatedFees]);
   return (
     <div className="md:flex md:flex-col">
       <div className="md:flex md:flex-col">
