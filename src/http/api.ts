@@ -23,12 +23,41 @@ export const endpoints = {
       },
     };
   },
+  parkingAddresses() {
+    return {
+      paginatedAddresses: async (user: { userId: number }) => {
+        try {
+          const response = await apiClient.post(
+            "/addresses/paginatedAddresses",
+            JSON.stringify(user)
+          );
+
+          return response.data;
+        } catch (err) {
+          console.log(err);
+        }
+      },
+    };
+  },
+  fees() {
+    return {
+      paginatedFees: async (user: { userId: number }) => {
+        try {
+          const response = await apiClient.post(
+            "/parkingFees/paginatedFees",
+            JSON.stringify(user)
+          );
+
+          return response.data;
+        } catch (err) {
+          console.log(err);
+        }
+      },
+    };
+  },
 };
 
 export const authentication = {
   userLogin: (userDetails: UserAuthDetails) =>
-    apiClient.post(
-      "/Login/Authenticate/?initialData=true",
-      JSON.stringify(userDetails)
-    ),
+    apiClient.post("/Login/Authenticate", JSON.stringify(userDetails)),
 };
